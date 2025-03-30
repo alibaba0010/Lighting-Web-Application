@@ -5,7 +5,10 @@ import {
   SendPaymentResponse,
   GetInfoResponse,
 } from "webln";
-import { convertSatsToUsd, convertUsdToSats } from "@getalby/lightning-tools";
+
+// Current BTC price in USD (this should be fetched from an API in production)
+const BTC_PRICE_USD = 65000;
+const SATS_PER_BTC = 100000000;
 
 export const useWebLNPayments = () => {
   const { provider, isEnabled } = useWebLN();
@@ -98,7 +101,7 @@ export const useWebLNPayments = () => {
 
   const convertSatsToFiat = async (sats: number): Promise<number> => {
     try {
-      return await convertSatsToUsd(sats);
+      return (sats * BTC_PRICE_USD) / SATS_PER_BTC;
     } catch (e) {
       setError("Failed to convert sats to fiat");
       return 0;
@@ -107,7 +110,7 @@ export const useWebLNPayments = () => {
 
   const convertFiatToSats = async (dollars: number): Promise<number> => {
     try {
-      return await convertUsdToSats(dollars);
+      return Math.floor((dollars * SATS_PER_BTC) / BTC_PRICE_USD);
     } catch (e) {
       setError("Failed to convert fiat to sats");
       return 0;

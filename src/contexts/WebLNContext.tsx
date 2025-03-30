@@ -1,7 +1,6 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { requestProvider, WebLNProvider } from "webln";
-import { getWebLNProvider } from "@getalby/sdk";
 
 interface WebLNContextType {
   provider: WebLNProvider | null;
@@ -32,27 +31,12 @@ export const WebLNProviderComponent: React.FC<{
       try {
         setConnecting(true);
         setError(null);
-
-        // Try to get Alby provider first
-        try {
-          const albyProvider = await getWebLNProvider();
-          if (albyProvider) {
-            setProvider(albyProvider);
-            setIsEnabled(true);
-            setConnecting(false);
-            return;
-          }
-        } catch (e) {
-          console.log("Alby provider not available, falling back to WebLN");
-        }
-
-        // Fall back to WebLN
         const weblnProvider = await requestProvider();
         setProvider(weblnProvider);
         setIsEnabled(true);
       } catch (e) {
         setError(
-          "Failed to connect to a Lightning wallet. Please install Alby or another WebLN-compatible wallet."
+          "Failed to connect to a Lightning wallet. Please install a WebLN-compatible wallet."
         );
       } finally {
         setConnecting(false);
