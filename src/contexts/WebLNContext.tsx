@@ -1,12 +1,14 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { requestProvider, WebLNProvider } from "webln";
+import type React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { requestProvider, type WebLNProvider } from "webln";
 
 interface WebLNContextType {
   provider: WebLNProvider | null;
   isEnabled: boolean;
   error: string | null;
   connecting: boolean;
+  connect: () => Promise<void>;
 }
 
 const WebLNContext = createContext<WebLNContextType>({
@@ -14,6 +16,7 @@ const WebLNContext = createContext<WebLNContextType>({
   isEnabled: false,
   error: null,
   connecting: false,
+  connect: async () => {},
 });
 
 export const useWebLN = () => useContext(WebLNContext);
@@ -26,28 +29,33 @@ export const WebLNProviderComponent: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
 
-  useEffect(() => {
-    const initializeWebLN = async () => {
-      try {
-        setConnecting(true);
-        setError(null);
-        const weblnProvider = await requestProvider();
-        setProvider(weblnProvider);
-        setIsEnabled(true);
-      } catch (e) {
-        setError(
-          "Failed to connect to a Lightning wallet. Please install a WebLN-compatible wallet."
-        );
-      } finally {
-        setConnecting(false);
-      }
-    };
+  const connect = async () => {
+    if (isEnabled) return;
 
-    initializeWebLN();
+    try {
+      setConnecting(true);
+      setError(null);
+      const weblnProvider = await requestProvider();
+      setProvider(weblnProvider);
+      setIsEnabled(true);
+    } catch (e) {
+      setError(
+        "Failed to connect to a Lightning wallet. Please install a WebLN-compatible wallet."
+      );
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  useEffect(() => {
+    // Try to connect automatically on load
+    connect();
   }, []);
 
   return (
-    <WebLNContext.Provider value={{ provider, isEnabled, error, connecting }}>
+    <WebLNContext.Provider
+      value={{ provider, isEnabled, error, connecting, connect }}
+    >
       {children}
     </WebLNContext.Provider>
   );

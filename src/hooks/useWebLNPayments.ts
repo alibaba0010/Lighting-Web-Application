@@ -19,7 +19,7 @@ export const useWebLNPayments = () => {
     paymentRequest: string
   ): Promise<SendPaymentResponse | null> => {
     if (!provider || !isEnabled) {
-      setError("WebLN provider not available");
+      setError("WebLN provider wallet not available or connected");
       return null;
     }
 
@@ -41,7 +41,7 @@ export const useWebLNPayments = () => {
     amount: number
   ): Promise<void> => {
     if (!provider || !isEnabled) {
-      setError("WebLN provider not available");
+      setError("WebLN provider wallet not available or connected");
       return;
     }
 
@@ -61,7 +61,7 @@ export const useWebLNPayments = () => {
 
   const getInfo = async (): Promise<GetInfoResponse | null> => {
     if (!provider || !isEnabled) {
-      setError("WebLN provider not available");
+      setError("WebLN provider wallet not available or connected");
       return null;
     }
 
@@ -82,7 +82,7 @@ export const useWebLNPayments = () => {
     args: RequestInvoiceArgs
   ): Promise<string | null> => {
     if (!provider || !isEnabled) {
-      setError("WebLN provider not available");
+      setError("WebLN provider wallet not available or connected");
       return null;
     }
 
