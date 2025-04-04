@@ -26,7 +26,6 @@ export const useWebLNPayments = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log("Sending payment:", paymentRequest);
       const response = await provider.sendPayment(paymentRequest);
       console.log("Payment response:", response);
       return response;
