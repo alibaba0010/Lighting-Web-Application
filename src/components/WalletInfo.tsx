@@ -11,7 +11,7 @@ import { BoltIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 export const WalletInfo: React.FC = () => {
   const { getInfo, loading, error } = useWebLNPayments();
   const [walletInfo, setWalletInfo] = useState<GetInfoResponse | null>(null);
-  const { isEnabled, connecting } = useWebLN();
+  const { isEnabled, connecting, connect } = useWebLN();
 
   useEffect(() => {
     const fetchWalletInfo = async () => {
@@ -44,9 +44,15 @@ export const WalletInfo: React.FC = () => {
           <ExclamationTriangleIcon className="h-5 w-5" />
           <h2 className="text-xl font-bold">Wallet Not Connected</h2>
         </div>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mb-4">
           Please connect your Lightning wallet to view your wallet information.
         </p>
+        <button
+          onClick={() => connect()}
+          className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          Connect Wallet
+        </button>
       </div>
     );
   }

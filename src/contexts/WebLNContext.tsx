@@ -1,6 +1,13 @@
 "use client";
+
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { requestProvider, type WebLNProvider } from "webln";
 
 interface WebLNContextType {
@@ -28,9 +35,12 @@ export const WebLNProviderComponent: React.FC<{
   const [isEnabled, setIsEnabled] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [hasAttemptedConnection, setHasAttemptedConnection] = useState(false);
 
-  const connect = async () => {
-    if (isEnabled) return;
+  // Use useCallback to memoize the connect function
+  const connect = useCallback(async () => {
+    // If already connected or currently connecting, don't try again
+    if (isEnabled || connecting) return;
 
     try {
       setConnecting(true);
@@ -38,24 +48,27 @@ export const WebLNProviderComponent: React.FC<{
       const weblnProvider = await requestProvider();
       setProvider(weblnProvider);
       setIsEnabled(true);
+      setHasAttemptedConnection(true);
     } catch (e) {
       setError(
         "Failed to connect to a Lightning wallet. Please install a WebLN-compatible wallet."
       );
+      setHasAttemptedConnection(true);
     } finally {
       setConnecting(false);
     }
+  }, [isEnabled, connecting]);
+
+  const contextValue = {
+    provider,
+    isEnabled,
+    error,
+    connecting,
+    connect,
   };
 
-  useEffect(() => {
-    // Try to connect automatically on load
-    connect();
-  }, []);
-
   return (
-    <WebLNContext.Provider
-      value={{ provider, isEnabled, error, connecting, connect }}
-    >
+    <WebLNContext.Provider value={contextValue}>
       {children}
     </WebLNContext.Provider>
   );

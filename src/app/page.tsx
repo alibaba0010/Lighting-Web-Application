@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { WalletInfo } from "../components/WalletInfo";
 import { PaymentForm } from "../components/PaymentForm";
 import { ScrollPayment } from "../components/ScrollPayment";
@@ -11,12 +11,14 @@ import { useWebLN } from "../contexts/WebLNContext";
 export default function Home() {
   const [recipientAddress, setRecipientAddress] = useState("");
   const { theme, setTheme } = useTheme();
-  const { provider, isEnabled, connecting, error } = useWebLN();
+  const { provider, isEnabled, connecting, error, connect } = useWebLN();
+
+  useEffect(() => {
+    connect();
+  }, [connect]);
 
   const handleConnectWallet = async () => {
-    // This will trigger the WebLN connection if not already connected
-    // The actual connection logic is in the WebLNContext
-    window.location.reload();
+    await connect();
   };
 
   return (
